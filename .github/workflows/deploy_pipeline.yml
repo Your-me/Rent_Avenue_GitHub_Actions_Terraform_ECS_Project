@@ -156,13 +156,34 @@ jobs:
         env:
           IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }}
         run: |
-          result=$(aws ecr describe-repositories --repository-names "${{ env.IMAGE_NAME  }}" | jq -r '.repositories[0].repositoryName')
-          echo "repo_name=$result" >> $GITHUB_ENV
+          if aws ecr describe-repositories --repository-names "$IMAGE_NAME" 2>/dev/null; then
+            echo "REPO_EXISTS=true" >> $GITHUB_ENV
+            echo "Repository exists"
+          else
+            echo "REPO_EXISTS=false" >> $GITHUB_ENV
+            echo "Repository does not exist"
+          fi
         continue-on-error: true
-
+      
       - name: Create ECR repository
         env:
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
-        if: env.repo_name != env.IMAGE_NAME
+          IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }}
+        if: env.REPO_EXISTS == 'false'
         run: |
-          aws ecr create-repository --repository-name ${{ env.IMAGE_NAME }}      
+          aws ecr create-repository \
+            --repository-name "$IMAGE_NAME" 
+          echo "Created ECR repository: $IMAGE_NAME"    
+#       - name: Check if ECR repository exists
+#         env:
+#           IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }}
+#         run: |
+#           result=$(aws ecr describe-repositories --repository-names "${{ env.IMAGE_NAME  }}" | jq -r '.repositories[0].repositoryName')
+#           echo "repo_name=$result" >> $GITHUB_ENV
+#         continue-on-error: true
+
+#       - name: Create ECR repository
+#         env:
+#           IMAGE_NAME: ${{ env.IMAGE_NAME }}
+#         if: env.repo_name != env.IMAGE_NAME
+#         run: |
+#           aws ecr create-repository --repository-name ${{ env.IMAGE_NAME }}      
