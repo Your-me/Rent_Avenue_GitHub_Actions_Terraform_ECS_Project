@@ -156,7 +156,7 @@ jobs:
         env:
           IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }}
         run: |
-          result=$(aws ecr describe-repositories --repository-names "${{ env.IMAGE_NAME  }}" | jq -r '.repositories[0].repositoryName')
+          result=$(aws ecr describe-repositories --repository-names "${{ env.IMAGE_NAME }}" | jq -r '.repositories[0].repositoryName')
           echo "repo_name=$result" >> $GITHUB_ENV
         continue-on-error: true
 
@@ -165,4 +165,5 @@ jobs:
           IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name}}
         if: env.repo_name == '' || env.repo_name != env.IMAGE_NAME
         run: |
-          aws ecr create-repository --repository-name ${{ env.IMAGE_NAME }}      
+          echo ${{ env.IMAGE_NAME }} 
+          aws ecr create-repository --repository-name $env.IMAGE_NAME }}      
