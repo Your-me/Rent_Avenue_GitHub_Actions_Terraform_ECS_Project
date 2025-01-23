@@ -48,7 +48,7 @@ jobs:
 
       - name: Run Terraform apply/destroy
         working-directory: ./infra
-        run: terraform ${{ env.TERRAFORM_ACTION }} -auto-approve
+        run: terraform ${{ env.TERRAFORM_ACTION }} -lock=false -auto-approve
 
       - name: Get Terraform output image name
         if: env.TERRAFORM_ACTION == 'apply'
