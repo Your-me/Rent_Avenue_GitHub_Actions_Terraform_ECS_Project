@@ -200,7 +200,7 @@ jobs:
         with:
           mode: start
           github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ec2-image-id: ami-0675c2408159d351e
+          ec2-image-id: ami-0dbdd53d41d1e8ba0
           ec2-instance-type: t2.micro
           subnet-id: ${{ needs.deploy_aws_infrastructure.outputs.private_data_subnet_az1_id }}
           security-group-id: ${{ needs.deploy_aws_infrastructure.outputs.runner_security_group_id }}
@@ -224,9 +224,7 @@ jobs:
       - create_ecr_repository
       - start_runner
     if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
-    runs-on: self-hosted
-    container:
-      image: ubuntu-latest  
+    runs-on: self-hosted 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
